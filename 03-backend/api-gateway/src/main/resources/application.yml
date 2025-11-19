@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY # Tên của Gateway trên Eureka
+
+  cloud:
+    gateway:
+      routes:
+        # 1. USER SERVICE (Đã có)
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**, /api/auth/**
+
+        # 3. RESTAURANT - API (Đã có)
+        - id: restaurant-api
+          uri: lb://RESTAURANT-SERVICE
+          predicates:
+            - Path=/api/restaurants/**, /api/menu-items/**
+
+        # 4. ORDER SERVICE (MỚI)
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/orders/**
+
+        # 5. PAYMENT SERVICE (MỚI)
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payments/**
+
+        - id: drone-api
+          uri: lb://DRONE-SERVICE
+          predicates:
+            - Path=/api/drones/**, /api/deliveries/**
+
+        - id: drone-websocket
+          uri: lb:ws://DRONE-SERVICE
+          predicates:
+            - Path=/api/drones/ws/**
+          filters:
+            - RewritePath=/api/drones/(?<remaining>.*), /$\{remaining}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

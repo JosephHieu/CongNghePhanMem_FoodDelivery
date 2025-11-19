@@ -1,0 +1,37 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: RESTAURANT-SERVICE
+
+  data:
+    mongodb:
+      uri: mongodb+srv://nguyenhoanghieu15102004:hieu15102004@congnghephanmem.uwysfem.mongodb.net
+      database: restaurant_service_db
+
+  main:
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+app:
+  jwt-secret: hsXSXV5UGLVBCqob4jHK6FzXCJ8OUtZNSBwdvYXv5I8XiR2Ef9
+  jwt-expiration-ms: 86400000
+
+logging:
+  level:
+    org.springframework.data.mongodb: INFO
+    org.springframework.security: INFO
+
+cloudinary:
+  cloud_name: dtux5p4sz
+  api_key: 598864493552961
+  api_secret: TJtqhhyevfvYdvAWUBuUZqHAOmg
+
+

@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: USER-SERVICE
+
+  data:
+    mongodb:
+      uri: mongodb+srv://nguyenhoanghieu15102004:hieu15102004@congnghephanmem.uwysfem.mongodb.net
+      database: user_service_db
+
+  main:
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+app:
+  jwt-secret: hsXSXV5UGLVBCqob4jHK6FzXCJ8OUtZNSBwdvYXv5I8XiR2Ef9
+  jwt-expiration-ms: 86400000
+
+logging:
+  level:
+    org.springframework.data.mongodb: INFO
+    org.springframework.security: INFO
