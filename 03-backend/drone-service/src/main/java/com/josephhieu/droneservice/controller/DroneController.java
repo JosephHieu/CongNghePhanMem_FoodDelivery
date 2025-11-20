@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/drones")
@@ -91,5 +92,35 @@ public class DroneController {
     @GetMapping("/{id}")
     public ResponseEntity<Drone> getDrone(@PathVariable String id) {
         return ResponseEntity.ok(droneService.getDrone(id));
+    }
+
+    @GetMapping("/{id}/location")
+    public ResponseEntity<?> getLocation(@PathVariable String id) {
+        return ResponseEntity.ok(droneRepo.findById(id).orElseThrow());
+    }
+
+    @PatchMapping("/{id}/location")
+    public ResponseEntity<?> updateLocation(
+            @PathVariable String id,
+            @RequestBody Map<String, Double> body
+    ) {
+        double lat = body.get("lat");
+        double lng = body.get("lng");
+
+        Drone updated = droneService.updateLocation(id, lat, lng);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/simulate/{id}")
+    public ResponseEntity<?> simulateFlight(
+            @PathVariable String id,
+            @RequestBody Map<String, Double> target
+    ) {
+        double targetLat = target.get("lat");
+        double targetLng = target.get("lng");
+
+        droneService.simulateFlight(id, targetLat, targetLng);
+
+        return ResponseEntity.ok("Flight simulation started");
     }
 }

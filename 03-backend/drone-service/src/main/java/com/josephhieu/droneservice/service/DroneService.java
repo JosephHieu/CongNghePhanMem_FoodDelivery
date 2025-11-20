@@ -112,4 +112,42 @@ public class DroneService {
         return droneRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Drone not found"));
     }
+
+    public Drone updateLocation(String id, double lat, double lng) {
+        Drone drone = droneRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Drone not found"));
+
+        drone.setLat(lat);
+        drone.setLng(lng);
+        drone.setStatus("DELIVERING");
+        drone.setAvailable(false);
+
+        return droneRepo.save(drone);
+    }
+
+    public void simulateFlight(String id, double targetLat, double targetLng) {
+
+        new Thread(() -> {
+            Drone drone = droneRepo.findById(id).orElseThrow();
+
+            double step = 20.0;
+
+            double latStep = (targetLat - drone.getLat()) / step;
+            double lngStep = (targetLng - drone.getLng()) / step;
+
+            for (int i = 0; i < step; i++) {
+                drone.setLat(drone.getLat() + latStep);
+                drone.setLng(drone.getLng() + lngStep);
+                drone.setStatus("DELIVERING");
+                droneRepo.save(drone);
+
+                try { Thread.sleep(500); } catch (Exception ignored) {}
+            }
+
+            drone.setStatus("IDLE");
+            drone.setAvailable(true);
+            droneRepo.save(drone);
+
+        }).start();
+    }
 }
