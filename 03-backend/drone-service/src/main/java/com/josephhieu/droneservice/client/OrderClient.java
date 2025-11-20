@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.*;
 public interface OrderClient {
 
     @PostMapping("/api/orders/{id}/delivered")
-    void markDelivered(@PathVariable String id);
+    void markDelivered(@PathVariable("id") String id);
 }

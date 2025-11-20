@@ -61,4 +61,12 @@ public class OrderController {
             return ResponseEntity.badRequest().body("Invalid status: " + body.get("status"));
         }
     }
+
+    @PostMapping("/{id}/delivered")
+    public ResponseEntity<?> markDelivered(@PathVariable String id) {
+        orderService.updateStatus(id, Status.COMPLETED);
+        return ResponseEntity.ok(Map.of(
+                "message", "Order completed"
+        ));
+    }
 }

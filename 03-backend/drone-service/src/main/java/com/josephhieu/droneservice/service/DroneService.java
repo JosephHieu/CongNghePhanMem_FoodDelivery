@@ -2,12 +2,15 @@ package com.josephhieu.droneservice.service;
 
 import com.josephhieu.droneservice.client.OrderClient;
 import com.josephhieu.droneservice.dto.AssignDroneRequest;
+import com.josephhieu.droneservice.dto.DroneLocationMessage;
 import com.josephhieu.droneservice.entity.DeliveryTask;
 import com.josephhieu.droneservice.entity.Drone;
 import com.josephhieu.droneservice.repository.DeliveryTaskRepository;
 import com.josephhieu.droneservice.repository.DroneRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,6 +24,9 @@ public class DroneService {
     private final DroneRepository droneRepo;
     private final DeliveryTaskRepository taskRepo;
     private final OrderClient orderClient;
+
+    @Autowired
+    private SimpMessagingTemplate messaging;
 
     /**
      * Assign available drone
@@ -65,21 +71,20 @@ public class DroneService {
      * Complete delivery
      */
     public void completeDelivery(String taskId) {
-
         DeliveryTask task = taskRepo.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Delivery Task not found"));
+                .orElseThrow(() -> new RuntimeException("Task not found"));
 
         task.setStatus("COMPLETED");
+        task.setCompletedAt(new Date());
         taskRepo.save(task);
 
-        // Free up drone
-        Drone drone = droneRepo.findById(task.getDroneId())
-                .orElseThrow(() -> new RuntimeException("Drone not found"));
-
+        // Free drone
+        Drone drone = droneRepo.findById(task.getDroneId()).get();
         drone.setAvailable(true);
+        drone.setStatus("IDLE");
         droneRepo.save(drone);
 
-        // Notify Order Service
+        // Notify order-service
         orderClient.markDelivered(task.getOrderId());
     }
 
@@ -114,6 +119,7 @@ public class DroneService {
     }
 
     public Drone updateLocation(String id, double lat, double lng) {
+
         Drone drone = droneRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Drone not found"));
 
@@ -121,8 +127,22 @@ public class DroneService {
         drone.setLng(lng);
         drone.setStatus("DELIVERING");
         drone.setAvailable(false);
+        drone.setUpdatedAt(new Date());
 
-        return droneRepo.save(drone);
+        Drone saved = droneRepo.save(drone);
+
+        // 🔥 Gửi realtime WebSocket update
+        messaging.convertAndSend(
+                "/topic/drone-location",
+                new DroneLocationMessage(
+                        drone.getId(),
+                        drone.getLat(),
+                        drone.getLng(),
+                        drone.getStatus()
+                )
+        );
+
+        return saved;
     }
 
     public void simulateFlight(String id, double targetLat, double targetLng) {
@@ -141,12 +161,28 @@ public class DroneService {
                 drone.setStatus("DELIVERING");
                 droneRepo.save(drone);
 
+                // 🔥 Gửi realtime qua WebSocket
+                messaging.convertAndSend(
+                        "/topic/drone-location",
+                        new DroneLocationMessage(
+                                drone.getId(),
+                                drone.getLat(),
+                                drone.getLng(),
+                                drone.getStatus()
+                        )
+                );
+
                 try { Thread.sleep(500); } catch (Exception ignored) {}
             }
 
             drone.setStatus("IDLE");
             drone.setAvailable(true);
             droneRepo.save(drone);
+
+            messaging.convertAndSend(
+                    "/topic/drone-location",
+                    new DroneLocationMessage(drone.getId(), drone.getLat(), drone.getLng(), drone.getStatus())
+            );
 
         }).start();
     }

@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // 🔓 Cho phép FeignClient gọi nội bộ
+                        .requestMatchers(HttpMethod.POST, "/api/orders/*/delivered").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/orders/*/status").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders/*/payment-callback").permitAll()
 
