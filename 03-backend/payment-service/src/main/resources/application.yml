@@ -1,0 +1,29 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: PAYMENT-SERVICE
+
+  data:
+    mongodb:
+      uri: mongodb+srv://nguyenhoanghieu15102004:hieu15102004@congnghephanmem.uwysfem.mongodb.net
+      database: payment_service_db
+
+app:
+  jwt-secret: hsXSXV5UGLVBCqob4jHK6FzXCJ8OUtZNSBwdvYXv5I8XiR2Ef9
+  jwt-expiration-ms: 86400000
+
+  vnpay:
+    tmnCode: "BUT55BVY"
+    hashSecret: "V0C722VD2KWCAIOWCC5EOI24150X9V0P"
+    payUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    returnUrl: "http://localhost:3000/payment-success"   # FE
+    ipnUrl: "http://localhost:8084/api/payments/vnpay-ipn" # callback server to server
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true

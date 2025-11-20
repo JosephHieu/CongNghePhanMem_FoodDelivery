@@ -73,26 +73,35 @@ public class OrderService {
     }
 
     public Order updateStatus(String orderId, Status status) {
-        Order o = repo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        o.setStatus(status);
-        o.setUpdatedAt(new Date());
-        Order updated = repo.save(o);
 
-        // if READY_FOR_DISPATCH -> call drone-service to assign drone
+        Order order = repo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // cập nhật trạng thái
+        order.setStatus(status);
+        order.setUpdatedAt(new Date());
+
+        Order updated = repo.save(order);
+
+        // Nếu order đã sẵn sàng giao (nhà hàng chuẩn bị xong)
         if (status == Status.READY_FOR_DISPATCH) {
+
             Map<String, Object> payload = new HashMap<>();
             payload.put("orderId", orderId);
-            payload.put("restaurantId", o.getRestaurantId());
-            payload.put("deliveryAddress", Map.of("userId", o.getUserId())); // minimal; drone-service can call user-service
+            payload.put("restaurantId", order.getRestaurantId());
+            payload.put("deliveryAddress", Map.of("userId", order.getUserId()));
+
             try {
                 droneClient.assignDrone(payload);
             } catch (Exception ex) {
-                // log and handle retry or set status to CANCELLED/FAILED_DELIVERY later
+                // TODO: Ghi log hoặc retry
+                System.out.println("Drone-service unavailable: " + ex.getMessage());
             }
         }
 
         return updated;
     }
+
 
     // Called by payment-service callback to mark paid
     public Order markPaid(String orderId, String paymentId) {

@@ -36,17 +36,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getByUser(userId));
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Order> updateStatus(@PathVariable String id, @RequestBody UpdateStatusRequest req) {
-        Status status;
-        try {
-            status = Status.valueOf(req.getStatus());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(orderService.updateStatus(id, status));
-    }
-
     // Endpoint used by payment-service callback to mark order paid
     @PostMapping("/{id}/payment-callback")
     public ResponseEntity<?> paymentCallback(@PathVariable String id, @RequestBody Map<String, String> payload) {
@@ -54,5 +43,22 @@ public class OrderController {
         String paymentId = payload.get("paymentId");
         orderService.markPaid(id, paymentId);
         return ResponseEntity.ok(Map.of("ok", true));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            String statusStr = body.get("status");
+            Status status = Status.valueOf(statusStr); // convert string -> enum
+
+            Order updated = orderService.updateStatus(id, status);
+            return ResponseEntity.ok(updated);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid status: " + body.get("status"));
+        }
     }
 }

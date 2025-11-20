@@ -2,6 +2,8 @@ package com.josephhieu.orderservice.entity;
 
 public enum Status {
 
+    PENDING_DELIVERY,
+    COD_PENDING,
     PENDING_PAYMENT,
     PAID,
     PREPARING,

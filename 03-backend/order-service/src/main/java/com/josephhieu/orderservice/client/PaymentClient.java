@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
-@FeignClient(name = "payment-service")
+@FeignClient(name = "PAYMENT-SERVICE")
 public interface PaymentClient {
 
     // create payment and return payment url info

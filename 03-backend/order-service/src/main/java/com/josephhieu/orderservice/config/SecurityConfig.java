@@ -18,11 +18,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/orders").authenticated() // require auth to create
+
+                        // 🔓 Cho phép FeignClient gọi nội bộ
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/*/status").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders/*/payment-callback").permitAll()
+
+                        // 🔒 Các API còn lại yêu cầu JWT
+                        .requestMatchers(HttpMethod.POST, "/api/orders").authenticated()
                         .requestMatchers("/api/orders/**").authenticated()
+
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

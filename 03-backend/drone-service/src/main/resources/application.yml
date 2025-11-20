@@ -1,0 +1,22 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: DRONE-SERVICE
+
+  data:
+    mongodb:
+      uri: mongodb+srv://nguyenhoanghieu15102004:hieu15102004@congnghephanmem.uwysfem.mongodb.net
+      database: drone_service_db
+
+app:
+  jwt-secret: hsXSXV5UGLVBCqob4jHK6FzXCJ8OUtZNSBwdvYXv5I8XiR2Ef9
+  jwt-expiration-ms: 86400000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
-@FeignClient(name = "drone-service")
+@FeignClient(name = "DRONE-SERVICE")
 public interface DroneClient {
 
     @PostMapping("/api/drones/assign")
