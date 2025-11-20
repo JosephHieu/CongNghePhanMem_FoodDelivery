@@ -15,8 +15,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Drone {
     @Id
     private String id;
+    private String name;
     private double lat;
     private double lng;
-    private boolean available;
-    private String status; // IDLE, DELIVERING
+    private Boolean available;
+
+    @Builder.Default
+    private String status = "IDLE"; // IDLE, DELIVERING
 }

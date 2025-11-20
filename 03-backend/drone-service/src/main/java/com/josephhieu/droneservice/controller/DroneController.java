@@ -54,4 +54,42 @@ public class DroneController {
     public ResponseEntity<List<DeliveryTask>> getAllTasks() {
         return ResponseEntity.ok(taskRepo.findAll());
     }
+
+    /**
+     * Create drone
+     */
+    @PostMapping
+    public ResponseEntity<Drone> createDrone(@RequestBody Drone request) {
+        Drone drone = droneService.createDrone(request.getName());
+        return ResponseEntity.ok(drone);
+    }
+
+    /**
+     * Update drone info
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Drone> updateDrone(
+            @PathVariable String id,
+            @RequestBody Drone request
+    ) {
+        Drone updated = droneService.updateDrone(id, request.getName(), request.getAvailable());
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Delete drone
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDrone(@PathVariable String id) {
+        droneService.deleteDrone(id);
+        return ResponseEntity.ok("Drone deleted");
+    }
+
+    /**
+     * Get single drone
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Drone> getDrone(@PathVariable String id) {
+        return ResponseEntity.ok(droneService.getDrone(id));
+    }
 }

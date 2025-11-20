@@ -82,4 +82,34 @@ public class DroneService {
         // Notify Order Service
         orderClient.markDelivered(task.getOrderId());
     }
+
+    public Drone createDrone(String name) {
+        Drone drone = Drone.builder()
+                .name(name)
+                .available(true)
+                .build();
+        return droneRepo.save(drone);
+    }
+
+    public Drone updateDrone(String id, String name, Boolean available) {
+        Drone drone = droneRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Drone not found"));
+
+        if (name != null) drone.setName(name);
+        if (available != null) drone.setAvailable(available);
+
+        return droneRepo.save(drone);
+    }
+
+    public void deleteDrone(String id) {
+        if (!droneRepo.existsById(id)) {
+            throw new RuntimeException("Drone not found");
+        }
+        droneRepo.deleteById(id);
+    }
+
+    public Drone getDrone(String id) {
+        return droneRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Drone not found"));
+    }
 }
