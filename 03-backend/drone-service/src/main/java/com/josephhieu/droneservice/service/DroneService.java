@@ -44,12 +44,19 @@ public class DroneService {
         DeliveryTask task = DeliveryTask.builder()
                 .orderId(req.getOrderId())
                 .droneId(drone.getId())
-                .restaurantLat(req.getRestaurantLat())
-                .restaurantLng(req.getRestaurantLng())
-                .customerLat(req.getCustomerLat())
-                .customerLng(req.getCustomerLng())
+
+                .restaurantLat(req.getRestaurant().getLat())
+                .restaurantLng(req.getRestaurant().getLng())
+
+                .customerLat(req.getCustomer().getLat())
+                .customerLng(req.getCustomer().getLng())
+
                 .status("ASSIGNED")
+                .createdAt(new Date())
+                .updatedAt(new Date())
+                .assignedAt(new Date())
                 .build();
+
 
         return taskRepo.save(task);
     }
