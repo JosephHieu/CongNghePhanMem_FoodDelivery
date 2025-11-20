@@ -1,0 +1,78 @@
+package com.josephhieu.droneservice.service;
+
+import com.josephhieu.droneservice.client.OrderClient;
+import com.josephhieu.droneservice.dto.AssignDroneRequest;
+import com.josephhieu.droneservice.entity.DeliveryTask;
+import com.josephhieu.droneservice.entity.Drone;
+import com.josephhieu.droneservice.repository.DeliveryTaskRepository;
+import com.josephhieu.droneservice.repository.DroneRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class DroneService {
+
+    private final DroneRepository droneRepo;
+    private final DeliveryTaskRepository taskRepo;
+    private final OrderClient orderClient;
+
+    /**
+     * Assign available drone
+     */
+    public DeliveryTask assignDrone(AssignDroneRequest req) {
+
+        // 1. Find available drone
+        Optional<Drone> optionalDrone = droneRepo.findFirstByAvailable(true);
+
+        if (optionalDrone.isEmpty()) {
+            throw new RuntimeException("No available drone");
+        }
+
+        Drone drone = optionalDrone.get();
+
+        // Mark drone busy
+        drone.setAvailable(false);
+        droneRepo.save(drone);
+
+        // 2. Create delivery task
+        DeliveryTask task = DeliveryTask.builder()
+                .orderId(req.getOrderId())
+                .droneId(drone.getId())
+                .restaurantLat(req.getRestaurantLat())
+                .restaurantLng(req.getRestaurantLng())
+                .customerLat(req.getCustomerLat())
+                .customerLng(req.getCustomerLng())
+                .status("ASSIGNED")
+                .build();
+
+        return taskRepo.save(task);
+    }
+
+    /**
+     * Complete delivery
+     */
+    public void completeDelivery(String taskId) {
+
+        DeliveryTask task = taskRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Delivery Task not found"));
+
+        task.setStatus("COMPLETED");
+        taskRepo.save(task);
+
+        // Free up drone
+        Drone drone = droneRepo.findById(task.getDroneId())
+                .orElseThrow(() -> new RuntimeException("Drone not found"));
+
+        drone.setAvailable(true);
+        droneRepo.save(drone);
+
+        // Notify Order Service
+        orderClient.markDelivered(task.getOrderId());
+    }
+}
