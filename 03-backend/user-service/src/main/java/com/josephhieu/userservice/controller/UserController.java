@@ -1,5 +1,6 @@
 package com.josephhieu.userservice.controller;
 
+import com.josephhieu.userservice.dto.request.RegisterRequest;
 import com.josephhieu.userservice.entity.User;
 import com.josephhieu.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,33 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAll());
+    }
+
+    // ============================
+// CREATE USER (ADMIN)
+// ============================
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody RegisterRequest req) {
+        return ResponseEntity.ok(userService.createUser(req));
+    }
+
+    // ============================
+// UPDATE USER BY ADMIN
+// ============================
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserByAdmin(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> body
+    ) {
+        return ResponseEntity.ok(userService.updateUserByAdmin(id, body));
+    }
+
+    // ============================
+// DELETE USER (ADMIN)
+// ============================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(Map.of("message", "User deleted"));
     }
 }
