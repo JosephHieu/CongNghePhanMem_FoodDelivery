@@ -1,10 +1,11 @@
-package com.josephhieu.apigateway.config; // Thay bằng package của bạn
+package com.josephhieu.apigateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 @Configuration
@@ -13,25 +14,19 @@ public class CorsConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
 
-        final CorsConfiguration corsConfig = new CorsConfiguration();
+        CorsConfiguration cors = new CorsConfiguration();
 
-        // 1. Cho phép request từ 3 cổng frontend của bạn
-        corsConfig.setAllowedOrigins(Arrays.asList(
+        cors.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173"
         ));
 
-        // 2. Cho phép tất cả các phương thức (POST, GET, PUT...)
-        corsConfig.addAllowedMethod("*");
+        cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        cors.setAllowedHeaders(Arrays.asList("*"));
+        cors.setAllowCredentials(true);
+        cors.setMaxAge(3600L);
 
-        // 3. Cho phép tất cả các header (bao gồm 'Authorization' để gửi JWT)
-        corsConfig.addAllowedHeader("*");
-
-        // 4. Cho phép gửi cookie/auth
-        corsConfig.setAllowCredentials(true);
-        corsConfig.setMaxAge(3600L); // Cache trong 1 giờ
-
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig); // Áp dụng cho TẤT CẢ các route
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cors);
 
         return new CorsWebFilter(source);
     }

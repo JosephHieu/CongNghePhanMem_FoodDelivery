@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +33,16 @@ public class UserService {
 
     public User getById(String id) {
         return  userRepository.findById(id).orElseThrow(null);
+    }
+
+    public User updateStatus(String id, int status) {
+        User u = userRepository.findById(id).orElseThrow();
+        u.setStatus(status);
+        u.setUpdatedAt(new Date());
+        return userRepository.save(u);
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 }

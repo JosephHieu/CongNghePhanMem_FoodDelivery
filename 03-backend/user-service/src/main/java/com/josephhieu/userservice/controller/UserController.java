@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -30,5 +32,15 @@ public class UserController {
     @GetMapping("/internal/{id}")
     public ResponseEntity<User> getUserInternal(@PathVariable String id) {
         return ResponseEntity.ok(userService.getById(id));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody Map<String, Integer> body) {
+        return ResponseEntity.ok(userService.updateStatus(id, body.get("status")));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userService.getAll());
     }
 }
