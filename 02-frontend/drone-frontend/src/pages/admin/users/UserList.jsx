@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Table, Tag, Button, Space, message } from "antd";
 import api from "../../../utils/api";
 
@@ -6,49 +6,39 @@ export default function UserList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 1. Load danh sách users
-  const loadUsers = async () => {
-    setLoading(true);
+  // ------------------------------
+  // FIX: loadUsers wrapped in useCallback
+  // ------------------------------
+  const loadUsers = useCallback(async () => {
     try {
+      setLoading(true);
+
       const res = await api.get("/api/users");
+
+      // FIX: Only set state AFTER api call (async)
       setUsers(res.data);
     } catch (err) {
       console.error(err);
       message.error("Failed to load users");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    let active = true;
-
-    const fetch = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get("/api/users");
-        if (active) {
-          setUsers(res.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    fetch();
-
-    return () => {
-      active = false;
-    };
   }, []);
 
-  // 2. Ban / Unban
+  // ------------------------------
+  // Run loadUsers inside effect (SAFE)
+  // ------------------------------
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  // ------------------------------
+  // Toggle status (ban/unban)
+  // ------------------------------
   const toggleStatus = async (id, status) => {
     try {
-      await api.put(`/api/users/me`, { status }); // backend bạn có updateProfile
-
-      message.success("Updated user");
+      await api.put(`/api/users/${id}/status`, { status });
+      message.success("Updated user status");
       loadUsers();
     } catch (err) {
       console.error(err);
@@ -95,6 +85,7 @@ export default function UserList() {
   return (
     <div>
       <h1 style={{ marginBottom: 20 }}>Users Management</h1>
+
       <Table
         rowKey="id"
         columns={columns}
