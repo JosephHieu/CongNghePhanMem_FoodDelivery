@@ -26,4 +26,6 @@ public class Restaurant {
     private double lng;
     private String imageUrl; // Cloudinary
     private List<String> menuItemIds;
+
+    private Integer status;
 }
