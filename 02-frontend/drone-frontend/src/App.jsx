@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import UserList from "./pages/admin/users/UserList.jsx";
 import RestaurantList from "./pages/admin/restaurants/RestaurantList";
+import OrderList from "./pages/admin/orders/OrderList";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
           <Route path="restaurants" element={<RestaurantList />} />
+          <Route path="orders" element={<OrderList />} />
         </Route>
       </Route>
     </Routes>

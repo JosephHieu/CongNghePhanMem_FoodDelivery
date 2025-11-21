@@ -1,5 +1,6 @@
 package com.josephhieu.orderservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,6 +16,7 @@ import java.util.List;
 public class Order {
 
     @Id
+    @JsonProperty("_id")
     private String id;
 
     private String userId;

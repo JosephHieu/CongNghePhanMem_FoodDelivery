@@ -69,4 +69,9 @@ public class OrderController {
                 "message", "Order completed"
         ));
     }
+
+    @GetMapping
+    public ResponseEntity<List<Order>> getAll() {
+        return ResponseEntity.ok(orderService.getAll());
+    }
 }

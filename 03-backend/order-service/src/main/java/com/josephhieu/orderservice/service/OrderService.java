@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -110,5 +111,9 @@ public class OrderService {
         o.setPaymentId(paymentId);
         o.setUpdatedAt(new Date());
         return repo.save(o);
+    }
+
+    public List<Order> getAll() {
+        return repo.findAll();
     }
 }
