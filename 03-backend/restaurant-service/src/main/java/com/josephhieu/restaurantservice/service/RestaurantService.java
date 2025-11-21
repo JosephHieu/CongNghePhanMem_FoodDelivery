@@ -71,4 +71,17 @@ public class RestaurantService {
         r.setStatus(status);
         return restaurantRepository.save(r);
     }
+
+    public Restaurant createWithImage(CreateRestaurantRequest req, String imageUrl) {
+        Restaurant r = Restaurant.builder()
+                .ownerId(req.getOwnerId())
+                .name(req.getName())
+                .address(req.getAddress())
+                .lat(req.getLat())
+                .lng(req.getLng())
+                .imageUrl(imageUrl)
+                .build();
+
+        return restaurantRepository.save(r);
+    }
 }

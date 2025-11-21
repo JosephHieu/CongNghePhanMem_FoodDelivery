@@ -68,4 +68,17 @@ public class RestaurantController {
     public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody Map<String, Integer> body) {
         return ResponseEntity.ok(service.updateStatus(id, body.get("status")));
     }
+
+    @PostMapping("/create-with-image")
+    public ResponseEntity<?> createWithImage(
+            @RequestPart("data") CreateRestaurantRequest req,
+            @RequestPart("file") MultipartFile file
+    ) {
+        try {
+            String url = imageService.upload(file);
+            return ResponseEntity.ok(service.createWithImage(req, url));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

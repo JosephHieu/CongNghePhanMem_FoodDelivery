@@ -1,6 +1,7 @@
 package com.josephhieu.restaurantservice.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,6 +19,7 @@ public class Restaurant {
 
 
     @Id
+    @JsonProperty("_id")
     private String id;
     private String ownerId;
     private String name;

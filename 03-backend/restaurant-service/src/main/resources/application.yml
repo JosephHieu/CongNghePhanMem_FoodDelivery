@@ -10,6 +10,11 @@ spring:
       uri: mongodb+srv://nguyenhoanghieu15102004:hieu15102004@congnghephanmem.uwysfem.mongodb.net
       database: restaurant_service_db
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   main:
     allow-bean-definition-overriding: true
 
